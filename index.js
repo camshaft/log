@@ -3,7 +3,6 @@
  */
 var xhr = require("xhr")
   , ws = require("ws")
-  , console = require("console")
   , storage = require("loStorage.js").session
   , defaults = require("defaults")
   , debounce = require('debounce')
@@ -13,7 +12,14 @@ var xhr = require("xhr")
   , once = require("once")
   , syslog = require("syslog");
 
-// Get basic browser info
+/**
+ * Make sure we have a `window.console`
+ */
+window.console = require("console");
+
+/**
+ * Get the system info for syslog format
+ */
 var browser = parse(navigator.userAgent).browser
   , hostname = (browser.name || '').replace(/ /g, "-")+"."+browser.version
   , proc_id = window.location.href.substring(0, 128);
@@ -156,8 +162,11 @@ function getClient(host, options) {
     if(options.debug) console.debug("connected to "+host);
 
     // Send our stored message back to the server
-    client.send((storage.get('log-messages')||[]).join(""));
-    storage.set('log-messages', []);
+    var message = (storage.get('log-messages')||[]).join("");
+    if(message) {
+      client.send();
+      storage.set('log-messages', []);
+    }
   };
 
   // Set our callbacks

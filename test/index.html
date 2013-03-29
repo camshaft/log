@@ -8,9 +8,12 @@
   <script type="text/javascript">
     var install = require("log");
 
-    install("ws://localhost:5000", {
+    install("ws://localhost:8080/websocket", {
       debounce: 200,
-      debug: true
+      debug: true,
+      syslog: {
+        app_name: "tree"
+      }
     });
 
     console.log("this is a test");
