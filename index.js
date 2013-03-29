@@ -70,7 +70,7 @@ function getClient(host, options) {
   var client = ws(host);
 
   if (options.forceXHR || !client) {
-    host = host.replace("ws", options.httpProto || "http");
+    host = options.httpHost;
     return function(text) {
       var req = xhr();
       req.open("POST",host,true);

@@ -15,7 +15,8 @@ $ component install CamShaft/log
 var install = require("log");
 
 // Patches the console object to log to the socket
-install("ws://localhost:5000", {
+install("ws://localhost:5000/path/to/log/ws", {
+  httpHost: "http://localhost:5000/path/to/log",
   debug: true
 });
 
