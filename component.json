@@ -1,6 +1,6 @@
 {
-  "name": "ws-log",
-  "repo": "CamShaft/ws-log",
+  "name": "log",
+  "repo": "CamShaft/log",
   "description": "Stream client side logs over a websocket (with http post fallback)",
   "version": "0.0.1",
   "keywords": [],

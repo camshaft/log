@@ -1,16 +1,15 @@
 
-# ws-log
+# log
 
   Stream client side logs over a websocket (with http post fallback)
 
 ## Installation
 
-    $ component install CamShaft/ws-log
+    $ component install CamShaft/log
 
 ## API
 
-    require("ws-log").patch("ws://localhost:5000", {
-      debounce: 1000,
+    require("log").connect("ws://localhost:5000", {
       debug: true
     });
 

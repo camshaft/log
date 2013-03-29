@@ -31,7 +31,7 @@ module.exports = exports = function(host, options) {
   return client.send.bind(client);
 };
 
-exports.patch = function(host, options) {
+exports.connect = function(host, options) {
   if(!options) options = {};
 
   var send = exports(host)

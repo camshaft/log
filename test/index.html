@@ -6,7 +6,7 @@
 
   <script type="text/javascript" src="../build/build.js"></script>
   <script type="text/javascript">
-    require("ws-log").patch("ws://localhost:5000", {debounce: 1000, debug: true});
+    require("log").connect("ws://localhost:5000", {debounce: 1000, debug: true});
 
     console.log("this is a test");
 
