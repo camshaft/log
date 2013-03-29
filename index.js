@@ -57,10 +57,10 @@ exports.connect = function(host, options) {
 
   function patch(out, format) {
     return function() {
-      out.apply(console, arguments);
-      var str = format.apply(format, arguments);
+      var args = arguments;
+      out.apply(console, args);
       setTimeout(function() {
-        messages.enqueue(str);
+        messages.enqueue(format.apply(format, args));
         emit();
       }, 0);
     };
