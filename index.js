@@ -67,7 +67,7 @@ exports.connect = function(host, options) {
 
   _onerror = window.onerror;
   window.onerror = function(message, url, line) {
-    var str = metric({
+    var str = metric.format({
       error: message,
       url: url,
       line: line
