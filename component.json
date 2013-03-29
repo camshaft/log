@@ -10,7 +10,8 @@
     "CamShaft/metric-log": "*",
     "CamShaft/syslog.js": "*",
     "ForbesLindesay/queue": "*",
-    "matthewmueller/debounce": "*"
+    "matthewmueller/debounce": "*",
+    "avetisk/defaults": "*"
   },
   "development": {
     "CamShaft/syslog.js": "*"

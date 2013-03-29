@@ -3,6 +3,7 @@
  */
 var xhr = require("xhr")
   , ws = require("ws")
+  , defaults = require("defaults")
   , debounce = require('debounce')
   , queue = require("queue")
   , metric = require("metric-log")
@@ -35,19 +36,20 @@ exports.patch = function(host, options) {
 
   var send = exports(host)
     , messages = queue()
-    , format = syslog(options.syslog);
+    , err = syslog(defaults({severity: 3}, options.syslog))
+    , info = syslog(options.syslog);
 
   var emit = debounce(function() {
-    var text = [];
+    var logs = [];
     while(!messages.isEmpty()) {
-      text.push(messages.dequeue());
+      logs.push(messages.dequeue());
     }
-    var str = text.join("");
+    var str = logs.join("");
     send(str);
     if(options.debug) console.debug(str);
   }, options.debounce);
 
-  function patch(out) {
+  function patch(out, format) {
     return function() {
       out.apply(console, arguments);
       var str = format.apply(format, arguments);
@@ -58,20 +60,20 @@ exports.patch = function(host, options) {
     };
   };
 
-  metric.log = patch(console.log.bind(console));
+  metric.log = patch(console.log.bind(console), info);
   console.metric = metric;
-  console.log = patch(console.log);
-  console.error = patch(console.error);
+  console.log = patch(console.log, info);
+  console.error = patch(console.error, err);
 
   _onerror = window.onerror;
-  window.onerror = function(err, url, line) {
+  window.onerror = function(message, url, line) {
     var str = metric({
-      error: err,
+      error: message,
       url: url,
       line: line
     });
 
-    messages.enqueue(format(str));
+    messages.enqueue(err(str));
     emit();
     if(_onerror) _onerror.apply(this, arguments);
   };
