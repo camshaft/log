@@ -4,7 +4,6 @@
 var xhr = require("xhr")
   , ws = require("ws")
   , console = require("console")
-  , each = require("each")
   , storage = require("loStorage.js").session
   , defaults = require("defaults")
   , debounce = require('debounce')
@@ -63,17 +62,22 @@ module.exports = exports = once(function(host, options) {
     };
   };
 
+  // This hackery is required for IE8
+  // where `console.log` doesn't have 'apply'
+  var log = Function.prototype.bind.call(console.log, console)
+    , error = Function.prototype.bind.call(console.error, console);
+
   /**
    * Load console.metric
    */
-  metric.log = patch(console.log.bind(console), info);
+  metric.log = patch(log, info);
   console.metric = metric;
 
   /**
    * Patch console.log and console.error
    */
-  console.log = patch(console.log, info);
-  console.error = patch(console.error, err);
+  console.log = patch(log, info);
+  console.error = patch(error, err);
 
   /**
    * Emit any uncaught errors
@@ -152,9 +156,7 @@ function getClient(host, options) {
     if(options.debug) console.debug("connected to "+host);
 
     // Send our stored message back to the server
-    each(storage.get('log-messages')||[], function(chunk) {
-      client.send(chunk);
-    });
+    client.send((storage.get('log-messages')||[]).join(""));
     storage.set('log-messages', []);
   };
 
