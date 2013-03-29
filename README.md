@@ -12,7 +12,10 @@ $ component install CamShaft/log
 ## API
 
 ```js
-require("log").connect("ws://localhost:5000", {
+var install = require("log");
+
+// Patches the console object to log to the socket
+install("ws://localhost:5000", {
   debug: true
 });
 

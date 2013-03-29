@@ -8,6 +8,7 @@ var xhr = require("xhr")
   , queue = require("queue")
   , metric = require("metric-log")
   , parse = require("user-agent-parser")
+  , once = require("once")
   , syslog = require("syslog");
 
 // Get basic browser info
@@ -15,32 +16,10 @@ var browser = parse(navigator.userAgent).browser
   , hostname = (browser.name || '').replace(/ /g, "-")+"."+browser.version
   , proc_id = window.location.href.substring(0, 128);
 
-module.exports = exports = function(host, options) {
+module.exports = exports = once(function(host, options) {
   if(!options) options = {};
 
-  var client = ws(host);
-
-  if (options.forceXHR || !client) {
-    host = host.replace("ws", options.httpProto || "http");
-    return function(text) {
-      var req = xhr();
-      req.open("POST",host,true);
-      req.send(text);
-    };
-  };
-
-  // TODO handle reconnection
-  client.onclose = function() {
-
-  };
-
-  return client.send.bind(client);
-};
-
-exports.connect = function(host, options) {
-  if(!options) options = {};
-
-  var send = exports(host, options)
+  var send = getClient(host, options)
     , messages = queue()
     , err = syslog(defaults({severity: 3, proc_id: proc_id, hostname: hostname}, options.syslog))
     , info = syslog(defaults({proc_id: proc_id, hostname: hostname}, options.syslog));
@@ -83,4 +62,26 @@ exports.connect = function(host, options) {
     emit();
     if(_onerror) _onerror.apply(this, arguments);
   };
+});
+
+function getClient(host, options) {
+  if(!options) options = {};
+
+  var client = ws(host);
+
+  if (options.forceXHR || !client) {
+    host = host.replace("ws", options.httpProto || "http");
+    return function(text) {
+      var req = xhr();
+      req.open("POST",host,true);
+      req.send(text);
+    };
+  };
+
+  // TODO handle reconnection
+  client.onclose = function() {
+
+  };
+
+  return client.send.bind(client);
 };

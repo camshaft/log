@@ -12,7 +12,8 @@
     "ForbesLindesay/queue": "*",
     "matthewmueller/debounce": "*",
     "avetisk/defaults": "*",
-    "component/user-agent-parser": "*"
+    "component/user-agent-parser": "*",
+    "component/once": "*"
   },
   "development": {},
   "license": "MIT",

@@ -6,7 +6,9 @@
 
   <script type="text/javascript" src="../build/build.js"></script>
   <script type="text/javascript">
-    require("log").connect("ws://localhost:5000", {
+    var install = require("log");
+
+    install("ws://localhost:5000", {
       debounce: 200,
       debug: true
     });
