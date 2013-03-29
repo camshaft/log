@@ -1,0 +1,22 @@
+{
+  "name": "ws-log",
+  "repo": "CamShaft/ws-log",
+  "description": "Stream client side logs over a websocket (with http post fallback)",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "yields/xhr": "*",
+    "CamShaft/ws": "*",
+    "CamShaft/metric-log": "*",
+    "CamShaft/syslog.js": "*",
+    "ForbesLindesay/queue": "*",
+    "matthewmueller/debounce": "*"
+  },
+  "development": {
+    "CamShaft/syslog.js": "*"
+  },
+  "license": "MIT",
+  "scripts": [
+    "index.js"
+  ]
+}

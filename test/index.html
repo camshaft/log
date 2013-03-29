@@ -1,0 +1,22 @@
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+
+  <script type="text/javascript" src="../build/build.js"></script>
+  <script type="text/javascript">
+    require("ws-log").patch("ws://localhost:5000", {debounce: 1000, debug: true});
+
+    console.log("this is a test");
+
+    var done = console.metric.profile("my-api-call");
+
+    setTimeout(function() {
+      done();
+    }, 10);
+
+    throw new Error("There was an error")
+  </script>
+</body>
+</html>
