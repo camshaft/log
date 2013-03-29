@@ -19,7 +19,16 @@ var browser = parse(navigator.userAgent).browser
   , hostname = (browser.name || '').replace(/ /g, "-")+"."+browser.version
   , proc_id = window.location.href.substring(0, 128);
 
+/**
+ * Create a connection to a websocket to recieve syslog-style log messages
+ *
+ * @param {String} host
+ * @param {Obj?} options
+ * @return {WebSocket.send|XMLHttpRequest.send}
+ * @api public
+ */
 module.exports = exports = once(function(host, options) {
+  // Defaults
   if(!options) options = {};
 
   var send = getClient(host, options)
@@ -27,6 +36,9 @@ module.exports = exports = once(function(host, options) {
     , err = syslog(defaults({severity: 3, proc_id: proc_id, hostname: hostname}, options.syslog))
     , info = syslog(defaults({proc_id: proc_id, hostname: hostname}, options.syslog));
 
+  /**
+   * Emit a message to the server
+   */
   var emit = debounce(function() {
     var logs = [];
     while(!messages.isEmpty()) {
@@ -37,6 +49,9 @@ module.exports = exports = once(function(host, options) {
     if(options.debug) console.debug(str);
   }, options.debounce);
 
+  /**
+   * Patch a console.* function to call emit
+   */
   function patch(out, format) {
     return function() {
       var args = arguments;
@@ -48,11 +63,21 @@ module.exports = exports = once(function(host, options) {
     };
   };
 
+  /**
+   * Load console.metric
+   */
   metric.log = patch(console.log.bind(console), info);
   console.metric = metric;
+
+  /**
+   * Patch console.log and console.error
+   */
   console.log = patch(console.log, info);
   console.error = patch(console.error, err);
 
+  /**
+   * Emit any uncaught errors
+   */
   _onerror = window.onerror;
   window.onerror = function(message, url, line) {
     var str = metric.format({
@@ -65,14 +90,33 @@ module.exports = exports = once(function(host, options) {
     emit();
     if(_onerror) _onerror.apply(this, arguments);
   };
+
+  /**
+   * Return the send method so they can use it other cases
+   */
+  return send;
 });
 
+/**
+ * Get client with fallback
+ *
+ * @param {String} host
+ * @param {Obj?} options
+ * @return {WebSocket.send|XMLHttpRequest.send}
+ * @api private
+ */
 function getClient(host, options) {
   if(!options) options = {};
 
+  /**
+   * Try to create a ws connection
+   */
   var client = ws(host)
     , retries = 0;
 
+  /**
+   * We don't have ws support or XHR is forced
+   */
   if (options.forceXHR || !client) {
     host = options.httpHost;
     return function(text) {
@@ -82,10 +126,13 @@ function getClient(host, options) {
     };
   };
 
-  // handle reconnection
+  /**
+   * If we were kicked off, try to reconnect
+   */
   function onclose (e) {
     if(e.type === "close") {
       if(options.debug) console.debug("could not connect to "+host+". Trying again.");
+
       setTimeout(function() {
         if(retries > options.maxRetries) return;
         if(options.debug) console.debug("reconnecting to "+host+"...");
@@ -94,17 +141,24 @@ function getClient(host, options) {
         client.onclose = onclose;
         retries++;
       }, options.timeout || 5000);
-    }
-  }
 
+    };
+  };
+
+  /**
+   * Send the saved messages to the server on a connection
+   */
   function onopen () {
     if(options.debug) console.debug("connected to "+host);
-    each(storage.get('log-messages'), function(chunk) {
+
+    // Send our stored message back to the server
+    each(storage.get('log-messages')||[], function(chunk) {
       client.send(chunk);
     });
     storage.set('log-messages', []);
-  }
+  };
 
+  // Set our callbacks
   client.onopen = onopen;
   client.onclose = onclose;
 
