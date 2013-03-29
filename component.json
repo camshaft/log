@@ -11,11 +11,10 @@
     "CamShaft/syslog.js": "*",
     "ForbesLindesay/queue": "*",
     "matthewmueller/debounce": "*",
-    "avetisk/defaults": "*"
+    "avetisk/defaults": "*",
+    "component/user-agent-parser": "*"
   },
-  "development": {
-    "CamShaft/syslog.js": "*"
-  },
+  "development": {},
   "license": "MIT",
   "scripts": [
     "index.js"

@@ -7,7 +7,13 @@ var xhr = require("xhr")
   , debounce = require('debounce')
   , queue = require("queue")
   , metric = require("metric-log")
+  , parse = require("user-agent-parser")
   , syslog = require("syslog");
+
+// Get basic browser info
+var hostname = window.location.hostname
+  , browser = parse(navigator.userAgent).browser
+  , proc_id = (browser.name || '').replace(/ /g, "-")+"."+browser.version;
 
 module.exports = exports = function(host, options) {
   if(!options) options = {};
@@ -36,8 +42,8 @@ exports.connect = function(host, options) {
 
   var send = exports(host, options)
     , messages = queue()
-    , err = syslog(defaults({severity: 3}, options.syslog))
-    , info = syslog(options.syslog);
+    , err = syslog(defaults({severity: 3, proc_id: proc_id, hostname: hostname}, options.syslog))
+    , info = syslog(defaults({proc_id: proc_id, hostname: hostname}, options.syslog));
 
   var emit = debounce(function() {
     var logs = [];
