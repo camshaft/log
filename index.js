@@ -34,7 +34,7 @@ module.exports = exports = function(host, options) {
 exports.connect = function(host, options) {
   if(!options) options = {};
 
-  var send = exports(host)
+  var send = exports(host, options)
     , messages = queue()
     , err = syslog(defaults({severity: 3}, options.syslog))
     , info = syslog(options.syslog);
