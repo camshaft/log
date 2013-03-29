@@ -11,9 +11,9 @@ var xhr = require("xhr")
   , syslog = require("syslog");
 
 // Get basic browser info
-var hostname = window.location.hostname
-  , browser = parse(navigator.userAgent).browser
-  , proc_id = (browser.name || '').replace(/ /g, "-")+"."+browser.version;
+var browser = parse(navigator.userAgent).browser
+  , hostname = (browser.name || '').replace(/ /g, "-")+"."+browser.version
+  , proc_id = window.location.href.substring(0, 128);
 
 module.exports = exports = function(host, options) {
   if(!options) options = {};
