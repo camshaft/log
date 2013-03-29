@@ -3,6 +3,9 @@
  */
 var xhr = require("xhr")
   , ws = require("ws")
+  , console = require("console")
+  , each = require("each")
+  , storage = require("loStorage.js").session
   , defaults = require("defaults")
   , debounce = require('debounce')
   , queue = require("queue")
@@ -67,7 +70,8 @@ module.exports = exports = once(function(host, options) {
 function getClient(host, options) {
   if(!options) options = {};
 
-  var client = ws(host);
+  var client = ws(host)
+    , retries = 0;
 
   if (options.forceXHR || !client) {
     host = options.httpHost;
@@ -78,10 +82,36 @@ function getClient(host, options) {
     };
   };
 
-  // TODO handle reconnection
-  client.onclose = function() {
+  // handle reconnection
+  function onclose (e) {
+    if(e.type === "close") {
+      if(options.debug) console.debug("could not connect to "+host+". Trying again.");
+      setTimeout(function() {
+        if(retries > options.maxRetries) return;
+        if(options.debug) console.debug("reconnecting to "+host+"...");
+        client = ws(host);
+        client.onopen = onopen;
+        client.onclose = onclose;
+        retries++;
+      }, options.timeout || 5000);
+    }
+  }
 
+  function onopen () {
+    if(options.debug) console.debug("connected to "+host);
+    each(storage.get('log-messages'), function(chunk) {
+      client.send(chunk);
+    });
+    storage.set('log-messages', []);
+  }
+
+  client.onopen = onopen;
+  client.onclose = onclose;
+
+  return function(data) {
+    // It's not open
+    if(client.readyState !== 1) return storage.push('log-messages', data);
+    // It's open
+    client.send(data);
   };
-
-  return client.send.bind(client);
 };
