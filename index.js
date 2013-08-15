@@ -137,7 +137,7 @@ function connect(host, options) {
     // Send our stored message back to the server
     var message = (storage.get('log-messages')||[]).join('');
     if (message) {
-      client.send();
+      client.send(message);
       storage.set('log-messages', []);
     }
   };
