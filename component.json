@@ -7,15 +7,10 @@
   "dependencies": {
     "yields/xhr": "*",
     "CamShaft/ws": "*",
-    "CamShaft/metric-log": "*",
-    "CamShaft/console": "*",
     "CamShaft/syslog.js": "*",
-    "ForbesLindesay/queue": "*",
     "matthewmueller/debounce": "*",
     "avetisk/defaults": "*",
     "component/user-agent-parser": "*",
-    "component/once": "*",
-    "component/each": "*",
     "js-coder/loStorage.js": "v1.1.0"
   },
   "development": {},
