@@ -71,7 +71,7 @@ module.exports = function(host, options) {
     var str = buffer.join('');
     send(str);
     buffer = [];
-    if(options.debug) console.debug(str);
+    if(options.debug) console.log(str);
   }, options.debounce);
 
   return function(str) {
@@ -114,11 +114,11 @@ function connect(host, options) {
    */
   function onclose (e) {
     if (e.type === 'close') {
-      if (options.debug) console.debug('could not connect to '+wshost+'. Trying again.');
+      if (options.debug) console.log('could not connect to '+wshost+'. Trying again.');
 
       setTimeout(function() {
         if (retries > options.maxRetries) return;
-        if (options.debug) console.debug('reconnecting to '+wshost+'...');
+        if (options.debug) console.log('reconnecting to '+wshost+'...');
         client = ws(wshost);
         client.onopen = onopen;
         client.onclose = onclose;
@@ -132,7 +132,7 @@ function connect(host, options) {
    * Send the saved messages to the server on a connection
    */
   function onopen () {
-    if(options.debug) console.debug('connected to '+wshost);
+    if(options.debug) console.log('connected to '+wshost);
 
     // Send our stored message back to the server
     var message = (storage.get('log-messages')||[]).join('');

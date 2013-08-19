@@ -233,19 +233,93 @@ module.exports = function (host) {
 };
 
 });
+require.register("component-pad/index.js", function(exports, require, module){
+
+/**
+ * Expose `pad()`.
+ */
+
+exports = module.exports = pad;
+
+/**
+ * Pad `str` to `len` with optional `c` char,
+ * favoring the left when unbalanced.
+ *
+ * @param {String} str
+ * @param {Number} len
+ * @param {String} c
+ * @return {String}
+ * @api public
+ */
+
+function pad(str, len, c) {
+  c = c || ' ';
+  if (str.length >= len) return str;
+  len = len - str.length;
+  var left = Array(Math.ceil(len / 2) + 1).join(c);
+  var right = Array(Math.floor(len / 2) + 1).join(c);
+  return left + str + right;
+}
+
+/**
+ * Pad `str` left to `len` with optional `c` char.
+ *
+ * @param {String} str
+ * @param {Number} len
+ * @param {String} c
+ * @return {String}
+ * @api public
+ */
+
+exports.left = function(str, len, c){
+  c = c || ' ';
+  if (str.length >= len) return str;
+  return Array(len - str.length + 1).join(c) + str;
+};
+
+/**
+ * Pad `str` right to `len` with optional `c` char.
+ *
+ * @param {String} str
+ * @param {Number} len
+ * @param {String} c
+ * @return {String}
+ * @api public
+ */
+
+exports.right = function(str, len, c){
+  c = c || ' ';
+  if (str.length >= len) return str;
+  return str + Array(len - str.length + 1).join(c);
+};
+});
 require.register("CamShaft-syslog.js/index.js", function(exports, require, module){
 /**
  * Module dependencies
  */
-var defaults = require("defaults");
+
+var defaults = require('defaults');
+var pad = require('pad');
 
 // Default config
 var config = {
   facility: 14,
   severity: 6,
   version: 1,
-  app_name: "app",
-  proc_id: "web.1"
+  hostname: 'nohost',
+  app_name: 'browser',
+  proc_id: 'web'
+};
+
+function toISOString(date) {
+  return date.getUTCFullYear()
+    + '-' + pad(date.getUTCMonth() + 1 + '', 2, '0')
+    + '-' + pad(date.getUTCDate() + 1 + '', 2, '0')
+    + 'T' + pad(date.getUTCHours() + 1 + '', 2, '0')
+    + ':' + pad(date.getUTCMinutes() + 1 + '', 2, '0')
+    + ':' + pad(date.getUTCSeconds() + 1 + '', 2, '0')
+    + '.' + String((date.getUTCMilliseconds()/1000).toFixed(3)).slice(2, 5)
+    + 'Z';
 };
 
 module.exports = exports = function(opts) {
@@ -253,13 +327,13 @@ module.exports = exports = function(opts) {
 
   defaults(opts, config);
 
-  var prefix = "<"+(opts.priority || opts.facility*8+opts.severity)+">"+opts.version
-    , system = [opts.hostname, opts.app_name, opts.proc_id, "- -"].join(" ");
+  var prefix = ['<', (opts.priority || opts.facility * 8 + opts.severity), '>', opts.version].join('')
+    , system = [opts.hostname, opts.app_name, opts.proc_id, '- -'].join(' ');
 
   return function() {
-    var message = Array.prototype.join.call(arguments, " ");
-    var msg = [prefix, (new Date).toISOString(), system, message].join(" ");
-    return [msg.length,msg].join(" ");
+    var message = Array.prototype.join.call(arguments, ' ');
+    var msg = [prefix, toISOString(new Date), system, message].join(' ');
+    return [msg.length, msg].join(' ');
   };
 };
 
@@ -1123,7 +1197,7 @@ module.exports = function(host, options) {
     var str = buffer.join('');
     send(str);
     buffer = [];
-    if(options.debug) console.debug(str);
+    if(options.debug) console.log(str);
   }, options.debounce);
 
   return function(str) {
@@ -1166,11 +1240,11 @@ function connect(host, options) {
    */
   function onclose (e) {
     if (e.type === 'close') {
-      if (options.debug) console.debug('could not connect to '+wshost+'. Trying again.');
+      if (options.debug) console.log('could not connect to '+wshost+'. Trying again.');
 
       setTimeout(function() {
         if (retries > options.maxRetries) return;
-        if (options.debug) console.debug('reconnecting to '+wshost+'...');
+        if (options.debug) console.log('reconnecting to '+wshost+'...');
         client = ws(wshost);
         client.onopen = onopen;
         client.onclose = onclose;
@@ -1184,7 +1258,7 @@ function connect(host, options) {
    * Send the saved messages to the server on a connection
    */
   function onopen () {
-    if(options.debug) console.debug('connected to '+wshost);
+    if(options.debug) console.log('connected to '+wshost);
 
     // Send our stored message back to the server
     var message = (storage.get('log-messages')||[]).join('');
@@ -1224,9 +1298,8 @@ require.alias("CamShaft-syslog.js/index.js", "log/deps/syslog/index.js");
 require.alias("CamShaft-syslog.js/index.js", "syslog/index.js");
 require.alias("avetisk-defaults/index.js", "CamShaft-syslog.js/deps/defaults/index.js");
 
-require.alias("component-user-agent-parser/src/ua-parser.js", "CamShaft-syslog.js/deps/user-agent-parser/src/ua-parser.js");
-require.alias("component-user-agent-parser/src/ua-parser.js", "CamShaft-syslog.js/deps/user-agent-parser/index.js");
-require.alias("component-user-agent-parser/src/ua-parser.js", "component-user-agent-parser/index.js");
+require.alias("component-pad/index.js", "CamShaft-syslog.js/deps/pad/index.js");
+
 require.alias("matthewmueller-debounce/index.js", "log/deps/debounce/index.js");
 require.alias("matthewmueller-debounce/index.js", "debounce/index.js");
 
