@@ -1,13 +1,13 @@
 {
   "name": "log",
-  "repo": "CamShaft/log",
+  "repo": "camshaft/log",
   "description": "Stream client side logs over a websocket (with http post fallback)",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "keywords": [],
   "dependencies": {
     "yields/xhr": "*",
-    "CamShaft/ws": "*",
-    "CamShaft/syslog.js": "*",
+    "camshaft/ws": "*",
+    "camshaft/syslog.js": "*",
     "matthewmueller/debounce": "*",
     "avetisk/defaults": "*",
     "component/user-agent-parser": "*",
