@@ -7,7 +7,7 @@ var xhr = require('xhr')
   , storage = require('loStorage.js').session
   , defaults = require('defaults')
   , debounce = require('debounce')
-  , parse = require('user-agent-parser')
+  , parse = require('ua-parser-js')
   , syslog = require('syslog');
 
 /**
