@@ -10,7 +10,7 @@
     "camshaft/syslog.js": "*",
     "matthewmueller/debounce": "*",
     "avetisk/defaults": "*",
-    "component/user-agent-parser": "*",
+    "benxamin/ua-parser-js": "0.6.3",
     "js-coder/loStorage.js": "v1.1.0"
   },
   "development": {},
