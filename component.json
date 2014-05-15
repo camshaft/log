@@ -2,7 +2,7 @@
   "name": "log",
   "repo": "camshaft/log",
   "description": "Stream client side logs over a websocket (with http post fallback)",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "keywords": [],
   "dependencies": {
     "yields/xhr": "*",
